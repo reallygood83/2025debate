@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { generateDebateScenario } from '../../../services/scenarioService';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../auth/[...nextauth]';
+import { authOptions } from '../auth/authOptions';
 
 export default async function handler(
   req: NextApiRequest,

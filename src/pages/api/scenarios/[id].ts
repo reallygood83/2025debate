@@ -5,7 +5,7 @@ import {
   deleteScenario 
 } from '../../../services/scenarioService';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../auth/[...nextauth]';
+import { authOptions } from '../auth/authOptions';
 
 export default async function handler(
   req: NextApiRequest,

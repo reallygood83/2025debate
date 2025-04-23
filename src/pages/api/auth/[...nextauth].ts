@@ -6,6 +6,9 @@ import GitHubProvider from 'next-auth/providers/github';
 import dbConnect from '../../../lib/mongoose';
 import User from '../../../models/User';
 import bcrypt from 'bcrypt';
+import { signIn, signOut, useSession } from 'next-auth/react';
+import { GetServerSideProps } from 'next';
+import { getServerSession } from 'next-auth/next';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -52,14 +55,14 @@ export const authOptions: NextAuthOptions = {
     // Optional OAuth providers
     ...(process.env.GITHUB_ID && process.env.GITHUB_SECRET ? [
       GitHubProvider({
-        clientId: process.env.GITHUB_ID,
-        clientSecret: process.env.GITHUB_SECRET,
+        clientId: process.env.GITHUB_ID!,
+        clientSecret: process.env.GITHUB_SECRET!,
       })
     ] : []),
     ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET ? [
       GoogleProvider({
-        clientId: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        clientId: process.env.GOOGLE_CLIENT_ID!,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       })
     ] : []),
   ],
@@ -90,4 +93,43 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
 };
 
-export default NextAuth(authOptions); 
+export default NextAuth(authOptions);
+
+export default function AuthButtons() {
+  const { data: session } = useSession();
+  
+  if (session) {
+    return (
+      <button onClick={() => signOut()}>
+        로그아웃
+      </button>
+    );
+  }
+  
+  return (
+    <button onClick={() => signIn()}>
+      로그인
+    </button>
+  );
+}
+
+export default function ProtectedPage() {
+  return <h1>인증된 사용자만 볼 수 있는 페이지입니다</h1>;
+}
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getServerSession(context.req, context.res, authOptions);
+  
+  if (!session) {
+    return {
+      redirect: {
+        destination: '/auth/signin',
+        permanent: false,
+      },
+    };
+  }
+  
+  return {
+    props: { session },
+  };
+}; 
