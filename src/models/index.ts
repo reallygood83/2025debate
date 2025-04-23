@@ -29,7 +29,7 @@ export {
   IScenario,
 };
 
-export default {
+const models = {
   User,
   Topic,
   Debate,
@@ -39,4 +39,6 @@ export default {
   Feedback,
   Session,
   Scenario,
-}; 
+};
+
+export default models; 
